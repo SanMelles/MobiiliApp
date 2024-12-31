@@ -1,12 +1,14 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Sqlite;
 
-public class WorkoutContext : DbContext
+public class WorkoutAppDbContext : DbContext
 {
     public DbSet<Workout> Workouts { get; set; }
     public DbSet<Exercise> Exercises { get; set; }
+    public DbSet<WorkoutHistory> WorkoutHistories { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlite("Filename=workout.db");
+        optionsBuilder.UseSqlite($"Filename=WorkoutApp.db");
     }
 }
