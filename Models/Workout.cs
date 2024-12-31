@@ -1,3 +1,4 @@
+
 public class Workout
 {
 	public int Id { get; set; }

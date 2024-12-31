@@ -4,6 +4,6 @@ public class Exercise
 	public string Name { get; set; }
 	public int Sets { get; set; }
 	public int Reps { get; set; }
-	public TimeSpan Duration { get; set; } // nt Plangi kestus
+	public double? Weight { get; set; }
 	public int WorkoutId { get; set; } // Seos Workout tabeliga (võõrvõti)
 }
