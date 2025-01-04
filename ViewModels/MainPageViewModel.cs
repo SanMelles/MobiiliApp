@@ -1,13 +1,19 @@
-public class MainPageViewModel : BaseViewModel
-{
-    public Command NavigateToWorkoutCommand { get; }
-    public Command NavigateToHistoryCommand { get; }
 
-    public MainPageViewModel()
+namespace MauiAppSolo.ViewModels
+{
+    public class MainPageViewModel : BaseViewModel
     {
-        NavigateToWorkoutCommand = new Command(async () =>
-            await Shell.Current.GoToAsync(nameof(WorkoutPage)));
-        NavigateToHistoryCommand = new Command(async () =>
-            await Shell.Current.GoToAsync(nameof(HistoryPage)));
+        private string welcomeMessage;
+
+        public string WelcomeMessage
+        {
+            get => welcomeMessage;
+            set => SetProperty(ref welcomeMessage, value);
+        }
+
+        public MainPageViewModel()
+        {
+            WelcomeMessage = "Welcome to Workout Tracker!";
+        }
     }
 }
