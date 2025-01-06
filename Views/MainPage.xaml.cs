@@ -1,4 +1,6 @@
-﻿namespace MauiAppSolo.Views
+﻿using MauiAppSolo.ViewModels;
+
+namespace MauiAppSolo.Views
 {
     public partial class MainPage : ContentPage
     {

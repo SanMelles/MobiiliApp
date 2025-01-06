@@ -1,19 +1,30 @@
+using System.Windows.Input;
+using MauiAppSolo.ViewModels;
 
 namespace MauiAppSolo.ViewModels
 {
     public class MainPageViewModel : BaseViewModel
     {
-        private string welcomeMessage;
-
-        public string WelcomeMessage
-        {
-            get => welcomeMessage;
-            set => SetProperty(ref welcomeMessage, value);
-        }
+        public ICommand NavigateToWorkoutCommand { get; }
+        public ICommand NavigateToHistoryCommand { get; }
 
         public MainPageViewModel()
         {
-            WelcomeMessage = "Welcome to Workout Tracker!";
+            // Commands with valid lambdas or method references
+            NavigateToWorkoutCommand = new Command(() => NavigateToWorkout());
+            NavigateToHistoryCommand = new Command(() => NavigateToHistory());
+        }
+
+        private void NavigateToWorkout()
+        {
+            // TODO: Add navigation logic here
+            Console.WriteLine("Navigating to Workout Page...");
+        }
+
+        private void NavigateToHistory()
+        {
+            // TODO: Add navigation logic here
+            Console.WriteLine("Navigating to History Page...");
         }
     }
 }

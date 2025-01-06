@@ -7,8 +7,15 @@ public class WorkoutAppDbContext : DbContext
     public DbSet<Exercise> Exercises { get; set; }
     public DbSet<WorkoutHistory> WorkoutHistories { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        optionsBuilder.UseSqlite($"Filename=WorkoutApp.db");
+        modelBuilder.Entity<Workout>()
+            .HasMany(w => w.Exercises)
+            .WithOne(e => e.Workout)
+            .HasForeignKey(e => e.WorkoutId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        base.OnModelCreating(modelBuilder);
     }
+
 }
