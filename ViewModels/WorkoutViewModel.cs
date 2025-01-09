@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
+using MauiAppSolo.Models;
 
 namespace MauiAppSolo.ViewModels
 {
