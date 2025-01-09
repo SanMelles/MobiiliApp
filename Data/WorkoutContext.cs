@@ -1,5 +1,7 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Sqlite;
+using MauiAppSolo.Models;
+using SQLite;
+using System.Linq.Expressions;
+
 
 public class WorkoutAppDbContext : DbContext
 {

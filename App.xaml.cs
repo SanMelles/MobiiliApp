@@ -1,4 +1,6 @@
-﻿namespace MauiAppSolo
+﻿using Microsoft.Maui.Controls;
+
+namespace MauiAppSolo
 {
     public partial class App : Application
     {
@@ -6,7 +8,7 @@
         {
             InitializeComponent();
 
-            MainPage = new MainPage();
+            MainPage = new AppShell();
         }
     }
 }
