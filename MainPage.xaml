@@ -2,12 +2,47 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MauiAppSolo.MainPage"
-             Title="MainPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             Title="Workout Tracker">
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+
+            <!-- Title -->
+            <Label Text="Welcome to Workout Tracker" 
+                   FontSize="28" 
+                   FontAttributes="Bold" 
+                   HorizontalOptions="Center" 
+                   VerticalOptions="Start" />
+
+            <!-- Workout Summary -->
+            <Frame BorderColor="LightGray" CornerRadius="10" Padding="15">
+                <VerticalStackLayout>
+                    <Label Text="Today's Workouts" 
+                           FontSize="20" 
+                           FontAttributes="Bold" />
+                    <Label Text="• Chest and Back - 8:00 AM" FontSize="16" />
+                    <Label Text="• Cardio - 6:00 PM" FontSize="16" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Buttons -->
+            <Button Text="Plan a New Workout" 
+                    BackgroundColor="#6792c2" 
+                    TextColor="White" 
+                    CornerRadius="10"
+                    Clicked="OnPlanWorkoutClicked" />
+
+            <Button Text="View Workout History" 
+                    BackgroundColor="#85bfde" 
+                    TextColor="White" 
+                    CornerRadius="10"
+                    Clicked="OnViewHistoryClicked" />
+
+            <Button Text="Settings" 
+                    BackgroundColor="#9fb3d1" 
+                    TextColor="White" 
+                    CornerRadius="10"
+                    Clicked="OnSettingsClicked" />
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>
-    
