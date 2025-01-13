@@ -1,70 +1,83 @@
 using SQLite;
 using MauiAppSolo.Models;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
-namespace MauiAppSolo.Data
+namespace MauiAppSolo.Data;
+
+public class WorkoutContext
 {
-    public class WorkoutAppDbContext : IAsyncDisposable
+    private readonly SQLiteAsyncConnection _database;
+
+    public WorkoutContext(string dbPath)
     {
-        private const string DbName = "WorkoutDb";
-        private static string DbPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), DbName);
+        _database = new SQLiteAsyncConnection(dbPath);
+        InitializeDatabaseAsync().ConfigureAwait(false); // Asynchronously initialize database tables
+    }
 
-        private SQLiteAsyncConnection _connection;
-        private SQLiteAsyncConnection Database => (_connection ??= new SQLiteAsyncConnection(DbPath));
-
-        // Create tables if they don't exist
-        public async Task InitializeDatabaseAsync()
+    private async Task InitializeDatabaseAsync()
+    {
+        try
         {
-            await Database.CreateTableAsync<Workout>();
-            await Database.CreateTableAsync<Exercise>();
-            await Database.CreateTableAsync<WorkoutHistory>();
+            await _database.CreateTableAsync<Workout>();
+            await _database.CreateTableAsync<Exercise>();
+            await _database.CreateTableAsync<ExerciseInfo>();
         }
-
-        // Add a workout
-        public async Task<int> AddWorkoutAsync(Workout workout)
+        catch (Exception ex)
         {
-            return await Database.InsertAsync(workout);
+            Console.WriteLine($"Error initializing database: {ex.Message}");
         }
+    }
 
-        // Get all workouts
-        public async Task<List<Workout>> GetAllWorkoutsAsync()
+    public async Task<List<Workout>> GetWorkoutsAsync()
+    {
+        try
         {
-            return await Database.Table<Workout>().ToListAsync();
+            return await _database.Table<Workout>().ToListAsync();
         }
-
-        // Get workout by id
-        public async Task<Workout> GetWorkoutByIdAsync(int id)
+        catch (Exception ex)
         {
-            return await Database.Table<Workout>().FirstOrDefaultAsync(w => w.Id == id);
+            Console.WriteLine($"Error fetching workouts: {ex.Message}");
+            return new List<Workout>();
         }
+    }
 
-        // Get exercises for a specific workout
-        public async Task<List<Exercise>> GetExercisesForWorkoutAsync(int workoutId)
+    public async Task<int> SaveWorkoutAsync(Workout workout)
+    {
+        try
         {
-            return await Database.Table<Exercise>().Where(e => e.WorkoutId == workoutId).ToListAsync();
+            return workout.Id == 0
+                ? await _database.InsertAsync(workout)
+                : await _database.UpdateAsync(workout);
         }
-
-        // Add exercise
-        public async Task<int> AddExerciseAsync(Exercise exercise)
+        catch (Exception ex)
         {
-            return await Database.InsertAsync(exercise);
+            Console.WriteLine($"Error saving workout: {ex.Message}");
+            return 0; // Return 0 to indicate failure
         }
+    }
 
-        // Delete workout
-        public async Task<int> DeleteWorkoutAsync(Workout workout)
+    public async Task<int> DeleteWorkoutAsync(Workout workout)
+    {
+        try
         {
-            return await Database.DeleteAsync(workout);
+            return await _database.DeleteAsync(workout);
         }
-
-        // Dispose the connection
-        public async ValueTask DisposeAsync()
+        catch (Exception ex)
         {
-            if (_connection != null)
-            {
-                await _connection.CloseAsync();
-            }
+            Console.WriteLine($"Error deleting workout: {ex.Message}");
+            return 0; // Return 0 to indicate failure
+        }
+    }
+
+    public async Task<Workout> GetWorkoutByIdAsync(int id)
+    {
+        try
+        {
+            return await _database.FindAsync<Workout>(id);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching workout by ID: {ex.Message}");
+            return null;
         }
     }
 }
