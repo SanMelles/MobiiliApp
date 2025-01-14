@@ -1,27 +1,69 @@
 using MauiAppSolo.Models;
-using System.Collections.ObjectModel;
 using MauiAppSolo.Data;
+using Microsoft.Maui.Controls;
+using Microsoft.Maui.Controls.Xaml;
 
-namespace MauiAppSolo
+namespace MauiAppSolo;
+
+public partial class WorkoutPage : ContentPage
 {
-    public partial class WorkoutPage : ContentPage
+    private readonly WorkoutContext _database;
+    private Workout _workout;
+    public List<Exercise> AvailableExercises { get; set; }
+
+    public WorkoutPage(WorkoutContext database)
     {
-        private readonly WorkoutContext _database;
+        InitializeComponent();
+        _database = database;
+        _workout = new Workout();
+        BindingContext = this;
 
-        public WorkoutPage()
-        {
-            _database = new WorkoutContext(Path.Combine(FileSystem.AppDataDirectory, "workouts.db3"));
-        }
+        LoadAvailableExercises();
+    }
 
-        private async void SaveWorkout(object sender, EventArgs e)
+    private async void OnAddExerciseClicked(object sender, EventArgs e)
+    {
+        if (AvailableExercisesListView.SelectedItem != null)
         {
-            if (BindingContext is Workout workout)
-            {
-                await _database.SaveWorkoutAsync(workout);
-                await DisplayAlert("Success", "Workout saved!", "OK");
-                await Navigation.PopAsync();  // Go back to the previous page
-            }
+            var selectedExercise = (Exercise)AvailableExercisesListView.SelectedItem;
+            _workout.Exercises.Add(selectedExercise);
+            OnPropertyChanged(nameof(_workout.Exercises));
         }
     }
 
+    private async Task LoadAvailableExercises()
+    {
+        try
+        {
+            AvailableExercises = await _database.GetExercisesAsync();
+            OnPropertyChanged(nameof(AvailableExercises));
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", $"Failed to load exercises: {ex.Message}", "OK");
+        }
+    }
+
+    private async void OnSaveWorkoutClicked(object sender, EventArgs e)
+    {
+        if (string.IsNullOrWhiteSpace(WorkoutNameEntry.Text))
+        {
+            await DisplayAlert("Validation Error", "Workout name cannot be empty.", "OK");
+            return;
+        }
+
+        _workout.Name = WorkoutNameEntry.Text;
+        _workout.Date = DateTime.Now;
+
+        try
+        {
+            await _database.SaveWorkoutAsync(_workout);
+            await DisplayAlert("Success", "Workout saved successfully!", "OK");
+            await Navigation.PopAsync();
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", $"Failed to save workout: {ex.Message}", "OK");
+        }
+    }
 }

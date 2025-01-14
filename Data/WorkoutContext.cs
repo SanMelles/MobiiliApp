@@ -1,83 +1,45 @@
 using SQLite;
 using MauiAppSolo.Models;
 
-namespace MauiAppSolo.Data;
 
-public class WorkoutContext
+namespace MauiAppSolo.Data
 {
-    private readonly SQLiteAsyncConnection _database;
-
-    public WorkoutContext(string dbPath)
+    public class WorkoutContext
     {
-        _database = new SQLiteAsyncConnection(dbPath);
-        InitializeDatabaseAsync().ConfigureAwait(false); // Asynchronously initialize database tables
-    }
+        private readonly SQLiteAsyncConnection _database;
 
-    private async Task InitializeDatabaseAsync()
-    {
-        try
+        public WorkoutContext(string dbPath)
+        {
+            _database = new SQLiteAsyncConnection(dbPath);
+        }
+
+        public async Task InitializeDatabaseAsync()
         {
             await _database.CreateTableAsync<Workout>();
             await _database.CreateTableAsync<Exercise>();
             await _database.CreateTableAsync<ExerciseInfo>();
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error initializing database: {ex.Message}");
-        }
-    }
 
-    public async Task<List<Workout>> GetWorkoutsAsync()
-    {
-        try
+        public Task<List<Workout>> GetWorkoutsAsync()
         {
-            return await _database.Table<Workout>().ToListAsync();
+            return _database.Table<Workout>().ToListAsync();
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error fetching workouts: {ex.Message}");
-            return new List<Workout>();
-        }
-    }
 
-    public async Task<int> SaveWorkoutAsync(Workout workout)
-    {
-        try
+        public Task<int> SaveWorkoutAsync(Workout workout)
         {
-            return workout.Id == 0
-                ? await _database.InsertAsync(workout)
-                : await _database.UpdateAsync(workout);
+            if (workout.Id != 0)
+            {
+                return _database.UpdateAsync(workout);
+            }
+            else
+            {
+                return _database.InsertAsync(workout);
+            }
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error saving workout: {ex.Message}");
-            return 0; // Return 0 to indicate failure
-        }
-    }
 
-    public async Task<int> DeleteWorkoutAsync(Workout workout)
-    {
-        try
+        public Task<int> DeleteWorkoutAsync(Workout workout)
         {
-            return await _database.DeleteAsync(workout);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error deleting workout: {ex.Message}");
-            return 0; // Return 0 to indicate failure
-        }
-    }
-
-    public async Task<Workout> GetWorkoutByIdAsync(int id)
-    {
-        try
-        {
-            return await _database.FindAsync<Workout>(id);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error fetching workout by ID: {ex.Message}");
-            return null;
+            return _database.DeleteAsync(workout);
         }
     }
 }

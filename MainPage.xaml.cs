@@ -1,59 +1,34 @@
-using MauiAppSolo.Models;
 using MauiAppSolo.Data;
+using Microsoft.Maui.Controls;
 
 namespace MauiAppSolo;
 
 public partial class MainPage : ContentPage
 {
-    private readonly WorkoutContext _database;
+    private readonly WorkoutContext _workoutContext;
 
-    public MainPage(WorkoutContext database)
+    public MainPage(WorkoutContext workoutContext)
     {
         InitializeComponent();
-        _database = database;
+        _workoutContext = workoutContext;
+
+        // Example: Fetch workouts and display in a ListView
+        // (Replace with your actual UI implementation)
+        var workouts = _workoutContext.GetWorkoutsAsync().Result;
+        // ... (bind workouts to a ListView)
     }
 
     private async void OnPlanWorkoutClicked(object sender, EventArgs e)
     {
-        try
-        {
-            var workout = new Workout
-            {
-                Name = "New Workout",
-                Date = DateTime.Now,
-            };
-
-            var workoutPage = new WorkoutPage
-            {
-                BindingContext = workout
-            };
-
-            await Navigation.PushAsync(workoutPage);
-        }
-        catch (Exception ex)
-        {
-            await DisplayAlert("Error", $"Unable to plan a workout: {ex.Message}", "OK");
-        }
+        var workoutPage = new WorkoutPage(_workoutContext);
+        await Navigation.PushAsync(workoutPage);
     }
 
     private async void OnViewHistoryClicked(object sender, EventArgs e)
     {
-        try
-        {
-            var workouts = await _database.GetWorkoutsAsync();
-            if (workouts == null || !workouts.Any())
-            {
-                await DisplayAlert("No Workouts", "No workout history found.", "OK");
-                return;
-            }
-
-            var workoutHistoryPage = new WorkoutHistoryPage(workouts);
-            await Navigation.PushAsync(workoutHistoryPage);
-        }
-        catch (Exception ex)
-        {
-            await DisplayAlert("Error", $"Unable to view workout history: {ex.Message}", "OK");
-        }
+        var workouts = await _workoutContext.GetWorkoutsAsync();
+        var workoutHistoryPage = new WorkoutHistoryPage(workouts);
+        await Navigation.PushAsync(workoutHistoryPage);
     }
 
     private async void OnSettingsClicked(object sender, EventArgs e)

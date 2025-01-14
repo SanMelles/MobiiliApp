@@ -1,28 +1,39 @@
 ﻿using MauiAppSolo.Data;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Maui.Controls;
 
 namespace MauiAppSolo
 {
     public partial class App : Application
     {
-        private readonly WorkoutContext _workoutContext;
-
         public App()
         {
             InitializeComponent();
 
-            // Initialize the WorkoutContext with the database path
-            var dbPath = Path.Combine(FileSystem.AppDataDirectory, "workouts.db3");
-            _workoutContext = new WorkoutContext(dbPath);
+            // Register WorkoutContext as a singleton service
+            var services = new ServiceCollection();
+            services.AddSingleton<WorkoutContext>();
+
+            // Build the service provider
+            ServiceProvider = services.BuildServiceProvider();
+
+            MainPage = new AppShell();
         }
 
-        protected override Window CreateWindow(IActivationState activationState) =>
-            new Window(new NavigationPage(new MainPage(_workoutContext)))
+        public static IServiceProvider ServiceProvider { get; private set; }
+
+        protected override Window CreateWindow(IActivationState activationState)
+        {
+            // Resolve WorkoutContext from the service provider
+            var workoutContext = ServiceProvider.GetRequiredService<WorkoutContext>();
+
+            return new Window(new NavigationPage(new MainPage(workoutContext)))
             {
                 Width = 600,
                 Height = 900,
                 X = 100,
                 Y = 100
             };
+        }
     }
 }
